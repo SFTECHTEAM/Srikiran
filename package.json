@@ -20,15 +20,12 @@
       "electron.cjs"
     ],
     "win": {
-      "target": "nsis",
-      "icon": "public/icon.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "installerIcon": "public/icon.png",
-      "uninstallerIcon": "public/icon.png"
-    }
+  "target": "nsis"
+},
+"nsis": {
+  "oneClick": false,
+  "allowToChangeInstallationDirectory": true
+}
   },
   "devDependencies": {
     "electron": "^29.0.0",
