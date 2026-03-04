@@ -2,99 +2,82 @@ name: Build Srikiran EXE + APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-
-  # =========================
-  # WINDOWS EXE BUILD
-  # =========================
   build-exe:
     name: Build Windows EXE
     runs-on: windows-latest
-
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache-dependency-path: package.json
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm install --no-package-lock
 
-      - name: Build Web (if required)
-        run: npm run build
-        continue-on-error: true
-
-      - name: Build Electron EXE
+      - name: Build EXE
         run: npm run electron:build
 
-      - name: Upload EXE Artifact
+      - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: Srikiran-Windows-EXE
-          path: |
-            dist/*.exe
-            release/*.exe
-            out/*.exe
+          path: release/*.exe
 
-
-  # =========================
-  # ANDROID APK BUILD
-  # =========================
   build-apk:
     name: Build Android APK
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache-dependency-path: package.json
 
-      - name: Setup Java 17
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '17'
-          cache: gradle
+          distribution: 'temurin'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm install --no-package-lock
 
-      - name: Install Capacitor (if not in package.json)
-        run: npm install @capacitor/core @capacitor/cli @capacitor/android
+      - name: Install Capacitor
+        run: npm install --no-package-lock @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: Build Web App
+      - name: Build web app
         run: npm run build
 
-      # IMPORTANT:
-      # Capacitor should ALREADY be initialized locally.
-      # DO NOT run cap init inside CI.
-      # Just sync.
+      - name: Init Capacitor
+        run: npx cap init Srikiran com.srikiran.app --web-dir dist
+
+      - name: Add Android platform
+        run: npx cap add android
 
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build Debug APK
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Srikiran-Android-APK
