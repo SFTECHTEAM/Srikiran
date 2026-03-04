@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "electron:build": "npm run build && electron-builder"
+   "electron:build": "npm run build && electron-builder --publish never"
   },
   "build": {
     "appId": "com.srikiran.app",
