@@ -9,6 +9,8 @@ jobs:
   build-exe:
     name: Build Windows EXE
     runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,7 +25,7 @@ jobs:
         run: npm install --no-package-lock
 
       - name: Build EXE
-        run: npm run electron:build
+        run: npm run build && electron-builder --publish never
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
@@ -82,3 +84,13 @@ jobs:
         with:
           name: Srikiran-Android-APK
           path: android/app/build/outputs/apk/debug/*.apk
+```
+
+**4.** Click **"Commit changes"**
+
+---
+
+## Key change:
+The important fix is this line in the EXE build:
+```
+--publish never
